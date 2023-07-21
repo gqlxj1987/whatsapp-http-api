@@ -25,6 +25,7 @@ import { WAMessage, WANumberExistResult } from '../structures/responses.dto';
 import { WAHAInternalEvent, WhatsappSession } from './abc/session.abc';
 import { NotImplementedByEngineError } from './exceptions';
 import { QR } from './QR';
+import { CreateGroupRequest } from '../structures/groups.dto';
 
 export class WhatsappSessionVenomCore extends WhatsappSession {
   engine = WAHAEngine.VENOM;
@@ -252,6 +253,41 @@ export class WhatsappSessionVenomCore extends WhatsappSession {
 
   setReaction(request: MessageReactionRequest) {
     throw new NotImplementedByEngineError();
+  }
+
+  /**
+   * Group methods
+   */
+  public createGroup(request: CreateGroupRequest) {
+    const participantIds = request.participants.map(
+      (participant) => participant.id,
+    );
+    return this.whatsapp.createGroup(request.name, participantIds);
+  }
+
+  public async getGroups() {
+    return await this.whatsapp.getAllChatsGroups();
+  }
+
+  public async getGroup(id) {
+    const groups = await this.whatsapp.getAllChatsGroups();
+    return groups[id];
+  }
+
+  public async deleteGroup(id) {
+    throw new NotImplementedByEngineError();
+  }
+
+  public async leaveGroup(id) {
+    return this.whatsapp.leaveGroup(id);
+  }
+
+  public async setDescription(id, description) {
+    return this.whatsapp.setGroupDescription(id, description);
+  }
+
+  public async getInviteCode(id): Promise<string> {
+    return this.whatsapp.getGroupInviteLink(id);
   }
 
   /**
